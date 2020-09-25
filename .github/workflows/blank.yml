@@ -32,3 +32,5 @@ jobs:
           echo ${{ github.event.pusher }}
           echo Add other actions to build,
           echo test, and deploy your project.
+      - name: Debug Action
+        uses: hmarr/debug-action@v1.0.0
