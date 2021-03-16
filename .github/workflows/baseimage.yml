@@ -8,5 +8,5 @@ jobs:
       image: quay.io/buildah/stable
     steps: 
     - uses: actions/checkout@v2
-    - run: buildah unshare ./script.sh
+    - run: ./script.sh
     - run: buildah images
