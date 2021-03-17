@@ -14,9 +14,8 @@ KOPS_VERSION=1.20.0-alpha.2
 YQ_VERSION=4.2.0
 DECK_VERSION=1.5.0
 
-function dnf_install_on {
-  local container=${1}
-  local packages=${2}
+function dnf_install {
+  local packages=${1}
   export $(podman exec installer grep VERSION_ID /etc/os-release)
 
   podman exec installer bash -c "yum install --quiet -y ${packages} \
@@ -28,22 +27,24 @@ function dnf_install_on {
   rm -rf /mnt/container/var/cache/dnf"
 }
 
-function pip_install_on {
-  local container=${1}
-  local packages=${2}
+function pip_install {
+  local packages=${1}
 
   podman exec installer bash -c "PYTHONUSERBASE=/mnt/container/usr/local \
-      ANSIBLE_SKIP_CONFLICT_CHECK=1 pip install --user --upgrade --ignore-installed --no-cache-dir ${packages}"
+    pip install --quiet --user --upgrade --ignore-installed --no-cache-dir ${packages}"
 }
 
 container=$(buildah from scratch)
-mount=$(buildah mount $container)
 
-podman run --detach --tty --name installer --volume ${mount}:/mnt/container:rw --volume $PWD:$PWD --workdir $PWD fedora:latest
+podman run --detach --tty --name installer --volume ${mount}:/mnt/container:rw --volume $PWD:$PWD:Z --workdir $PWD fedora:latest
 podman exec installer bash -c "yum upgrade -y --quiet"
 
-dnf_install_on $container "python awscli git"
-pip_install_on $container "-r requirements.txt"
+mount=$(buildah mount $container)
+
+dnf_install "python awscli git"
+pip_install "-r requirements.txt"
+
+buildah unmount $container
 
 curl -sSLO "https://storage.googleapis.com/kubernetes-release/release/v${KUBECTL_VERSION}/bin/linux/amd64/kubectl"
 chmod u+x kubectl
