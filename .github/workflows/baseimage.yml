@@ -10,5 +10,5 @@ jobs:
         --security-opt seccomp=unconfined
     steps: 
     - uses: actions/checkout@v2
-    - run: ./script.sh
+    - run: buildah unshare ./script.sh
     - run: buildah images
