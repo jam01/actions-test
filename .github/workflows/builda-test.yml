@@ -40,3 +40,4 @@ jobs:
         restore-keys: |
           ${{ runner.os }}-containers-
     - run: buildah images
+    - run: ls -al /var/lib/containers
