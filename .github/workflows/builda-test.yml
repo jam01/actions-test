@@ -13,13 +13,13 @@ jobs:
     runs-on: ubuntu-latest
     container:
       image: quay.io/buildah/stable
-      options: --security-opt seccomp=unconfined --security-opt apparmor=unconfined --device /dev/fuse --volume /var/lib/containers:/var/lib/containers
+      options: --security-opt seccomp=unconfined --security-opt apparmor=unconfined --device /dev/fuse --volume /tmp/containers:/var/lib/containers
     steps:
     - uses: actions/checkout@v2
     - name: Cache containers
       uses: actions/cache@v2
       with:
-        path: /var/lib/containers
+        path: /tmp/containers
         key: ${{ runner.os }}-containers-${{ github.sha }}
         restore-keys: |
           ${{ runner.os }}-containers-
@@ -35,9 +35,10 @@ jobs:
     - name: Cache containers
       uses: actions/cache@v2
       with:
-        path: /var/lib/containers
+        path: /tmp/containers
         key: ${{ runner.os }}-containers-${{ github.sha }}
         restore-keys: |
           ${{ runner.os }}-containers-
+    - run: sed -i -e '/additionalimage.*/a "/tmp/containers",' /etc/containers/storage.conf
     - run: buildah images
     - run: ls -al /var/lib/containers
