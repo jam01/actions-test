@@ -2,6 +2,13 @@ name: buildah test
 on:
   workflow_dispatch:
 jobs:
+  # ubuntu:
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #   - uses: actions/checkout@v2
+  #   - run: buildah unshare ./buildah-test.sh
+  #   - run: buildah images
+  #   - run: ls -al /var/lib/containers
   test:
     runs-on: ubuntu-latest
     container:
@@ -9,12 +16,27 @@ jobs:
       options: --security-opt seccomp=unconfined --security-opt apparmor=unconfined --device /dev/fuse --volume /var/lib/containers:/var/lib/containers
     steps:
     - uses: actions/checkout@v2
+    - name: Cache containers
+      uses: actions/cache@v2
+      with:
+        path: /var/lib/containers
+        key: ${{ runner.os }}-containers-${{ github.sha }}
+        restore-keys: |
+          ${{ runner.os }}-containers-
     - run: buildah unshare ./buildah-test.sh
     - run: buildah images
     - run: ls -al /var/lib/containers
+
   review:
     runs-on: ubuntu-latest
     needs: [ test ]
     steps:
     - uses: actions/checkout@v2
+    - name: Cache containers
+      uses: actions/cache@v2
+      with:
+        path: /var/lib/containers
+        key: ${{ runner.os }}-containers-${{ github.sha }}
+        restore-keys: |
+          ${{ runner.os }}-containers-
     - run: buildah images
