@@ -17,32 +17,31 @@ DECK_VERSION=1.5.0
 function dnf_install_on {
   local container=${1}
   local packages=${2}
-  local mount=$(buildah mount $container)
-  local installer_mount=/mnt/container
-  export $(podman run fedora:latest grep VERSION_ID /etc/os-release)
+  export $(podman exec installer grep VERSION_ID /etc/os-release)
 
-  podman run --volume ${mount}:${installer_mount}:rw fedora:latest bash -c "yum install --quiet -y ${packages} \
-      --installroot ${installer_mount} --releasever $VERSION_ID \
+  podman exec installer bash -c "yum install --quiet -y ${packages} \
+      --installroot /mnt/container --releasever $VERSION_ID \
       --setopt install_weak_deps=false --setopt tsflags=nodocs \
       --setopt override_install_langs=en_US.utf8 \
-    && yum clean all -y --installroot $installer_mount --releasever $VERSION_ID
-  rm -rf ${installer_mount}/var/cache/yum
-  rm -rf ${installer_mount}/var/cache/dnf"
-
-  buildah unmount $container
+    && yum clean all -y --installroot /mnt/container --releasever $VERSION_ID
+  rm -rf /mnt/container/var/cache/yum
+  rm -rf /mnt/container/var/cache/dnf"
 }
 
 function pip_install_on {
   local container=${1}
   local packages=${2}
-  local mount=$(buildah mount $container)
 
-  PYTHONUSERBASE=${mount}/usr/local ANSIBLE_SKIP_CONFLICT_CHECK=1 pip install --user --upgrade --ignore-installed --no-cache-dir $packages
-
-  buildah unmount $container
+  podman exec installer bash -c "PYTHONUSERBASE=/mnt/container/usr/local \
+      ANSIBLE_SKIP_CONFLICT_CHECK=1 pip install --user --upgrade --ignore-installed --no-cache-dir ${packages}"
 }
 
 container=$(buildah from scratch)
+mount=$(buildah mount $container)
+
+podman run --detach --tty --name installer --volume ${mount}:/mnt/container:rw --volume $PWD:$PWD --workdir $PWD fedora:latest
+podman exec installer bash -c "yum upgrade -y --quiet"
+
 dnf_install_on $container "python awscli git"
 pip_install_on $container "-r requirements.txt"
 
@@ -68,7 +67,7 @@ mv kops-linux-amd64 kops
 chmod +x kops
 buildah copy $container "kops" /usr/local/bin/
 
-curl -LO "https://github.com/mikefarah/yq/releases/download/v${YQ_VERSION}/yq_linux_amd64"
+curl -sSLO "https://github.com/mikefarah/yq/releases/download/v${YQ_VERSION}/yq_linux_amd64"
 mv yq_linux_amd64 yq
 chmod +x yq
 buildah copy $container "yq" /usr/local/bin/
@@ -79,3 +78,7 @@ buildah copy $container "deck" /usr/local/bin/
 
 buildah commit --rm $container $IMAGE_NAME:latest
 buildah tag $IMAGE_NAME:latest $IMAGE_NAME:$IMAGE_VERSION
+
+# buildah login --username $REGISTRY_USR --password $REGISTRY_PSW $IMAGE_NAME
+# buildah push $IMAGE_NAME:latest
+# buildah push $IMAGE_NAME:$IMAGE_VERSION
