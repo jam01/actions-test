@@ -6,4 +6,4 @@ set -o errexit
 builder=$(buildah from scratch)
 mount=$(buildah mount $builder)
 buildah unmount $builder
-buildah commit localhost/test:latest
+buildah commit --rm $builder localhost/test:latest
