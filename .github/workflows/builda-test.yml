@@ -39,6 +39,6 @@ jobs:
         key: ${{ runner.os }}-containers-${{ github.sha }}
         restore-keys: |
           ${{ runner.os }}-containers-
-    - run: sed -i -e '/additionalimage.*/a "/tmp/containers",' /etc/containers/storage.conf
+    - run: sudo sed -i -e '/additionalimage.*/a "/tmp/containers"' /etc/containers/storage.conf
     - run: buildah images
     - run: ls -al /var/lib/containers
