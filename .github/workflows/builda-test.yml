@@ -6,13 +6,14 @@ jobs:
     runs-on: ubuntu-latest
     container:
       image: quay.io/buildah/stable
-      options: --security-opt seccomp=unconfined --security-opt apparmor=unconfined --device /dev/fuse
+      options: --security-opt seccomp=unconfined --security-opt apparmor=unconfined --device /dev/fuse --volume /var/lib/containers:/var/lib/containers
     steps:
     - uses: actions/checkout@v2
     - run: buildah unshare ./buildah-test.sh
     - run: buildah images
   review:
     runs-on: ubuntu-latest
+    needs: [ test ]
     steps:
     - uses: actions/checkout@v2
     - run: buildah images
