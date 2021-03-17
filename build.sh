@@ -37,7 +37,7 @@ function pip_install_on {
   local packages=${2}
   local mount=$(buildah mount $container)
 
-  PYTHONUSERBASE=${mount}/usr/local pip install --user --upgrade --ignore-installed --no-cache-dir $packages
+  PYTHONUSERBASE=${mount}/usr/local ANSIBLE_SKIP_CONFLICT_CHECK=1 pip install --user --upgrade --ignore-installed --no-cache-dir $packages
 
   buildah unmount $container
 }
