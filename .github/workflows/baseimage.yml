@@ -6,6 +6,8 @@ jobs:
     runs-on: ubuntu-latest
     container: 
       image: quay.io/buildah/stable
+      options:
+        --security-opt seccomp=unconfined
     steps: 
     - uses: actions/checkout@v2
     - run: ./script.sh
