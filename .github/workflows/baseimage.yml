@@ -7,7 +7,7 @@ jobs:
     container: 
       image: quay.io/buildah/stable
       options:
-        --security-opt seccomp=unconfined
+        --security-opt seccomp=unconfined --security-opt apparmor=unconfined
     steps: 
     - uses: actions/checkout@v2
     - run: buildah unshare ./script.sh
