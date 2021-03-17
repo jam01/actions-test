@@ -35,11 +35,10 @@ function pip_install {
 }
 
 container=$(buildah from scratch)
+mount=$(buildah mount $container)
 
 podman run --detach --tty --name installer --volume ${mount}:/mnt/container:rw --volume $PWD:$PWD:Z --workdir $PWD fedora:latest
 podman exec installer bash -c "yum upgrade -y --quiet"
-
-mount=$(buildah mount $container)
 
 dnf_install "python awscli git"
 pip_install "-r requirements.txt"
