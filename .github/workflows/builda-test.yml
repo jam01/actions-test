@@ -1,0 +1,13 @@
+name: buildah test
+on:
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    container:
+      image: quay.io/buildah/stable
+      options: --security-opt seccomp=unconfined --security-opt apparmor=unconfined --device /dev/fuse
+    steps:
+    - uses: actions/checkout@v2
+    - run: buildah unshare ./buildah-test.sh
+    - run: buildah images
