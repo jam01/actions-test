@@ -30,7 +30,7 @@ jobs:
           ${{ runner.os }}-containers-
     - run: buildah unshare ./buildah-test.sh
     - run: buildah images
-    - run: ls -al /var/lib/containers/storage/overlay-images/
+    - run: ls -al /tmp/storage/overlay-images/
 
   review:
     runs-on: ubuntu-latest
@@ -46,4 +46,4 @@ jobs:
           ${{ runner.os }}-containers-
     - run: sudo sed -i 's|/var/lib/containers/storage|/tmp/storage|g' /etc/containers/storage.conf
     - run: buildah images
-    - run: ls -al /tmp/containers
+    - run: ls -al /tmp/storage/overlay-images/
