@@ -14,5 +14,7 @@ jobs:
     - run: |
         podman run --security-opt seccomp=unconfined --security-opt apparmor=unconfined --device /dev/fuse \
         -e "VERSION=${{ github.sha }}" -v "/tmp/storage:/var/lib/containers/storage" -v $PWD:$PWD -w $PWD \
-        quay.io/buildah/stable bash -c "buildah unshare ./buildah-test.sh"
-    - run: podman images
+        quay.io/buildah/stable bash -c "buildah unshare ./buildah-test.sh
+          buildah images
+          ls -al /var/lib/containers/storage"
+    - run: ls -al /tmp/storage && buildah images && podman images
