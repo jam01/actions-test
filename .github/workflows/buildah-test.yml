@@ -21,7 +21,7 @@ jobs:
       env:
         VERSION: ${{ github.sha }}
     - run: buildah images
-    - run: podman unshare bash -c "podman save -o buildtools-${{ github.sha }}.tar localhost/test:${{ github.sha }}"
+    - run: buildah unshare bash -c "podman save -o buildtools-${{ github.sha }}.tar localhost/test:${{ github.sha }}"
     - name: Temporarily save Docker image
       uses: actions/upload-artifact@v2
       with:
