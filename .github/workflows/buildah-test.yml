@@ -41,5 +41,5 @@ jobs:
         name: buildtools-${{ github.sha }}.tar
         path: buildtools-${{ github.sha }}.tar
     - run: pwd && ls -al
-    - run: buildah unshare bash -c "podman load < buildtools-${{ github.sha }}.tar"
+    - run: docker load < buildtools-${{ github.sha }}.tar
     - run: buildah images
