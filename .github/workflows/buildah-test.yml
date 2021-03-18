@@ -25,7 +25,7 @@ jobs:
     - name: Temporarily save Docker image
       uses: actions/upload-artifact@v2
       with:
-        name: buildtools-${{ github.sha }}.tar
+        name: buildtools-${{ github.sha }}
         path: buildtools-${{ github.sha }}.tar
         retention-days: 1
 
@@ -38,8 +38,7 @@ jobs:
     - name: Retrieve saved Docker image
       uses: actions/download-artifact@v2
       with:
-        name: buildtools-${{ github.sha }}.tar
-        path: buildtools-${{ github.sha }}.tar
+        name: buildtools-${{ github.sha }}
     - run: pwd && ls -al
     - run: docker load < buildtools-${{ github.sha }}.tar
     - run: buildah images
