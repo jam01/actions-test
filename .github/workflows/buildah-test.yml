@@ -26,8 +26,6 @@ jobs:
       with:
         path: /tmp/storage
         key: buildah-storage-${{ github.sha }}
-        restore-keys: |
-          buildah-storage-
     - run: buildah unshare ./buildah-test.sh
     - run: buildah images
     - run: ls -al /tmp/storage/overlay-images/
@@ -42,8 +40,6 @@ jobs:
       with:
         path: /tmp/storage
         key: buildah-storage-${{ github.sha }}
-        restore-keys: |
-          buildah-storage-
     - run: sudo sed -i 's|/var/lib/containers/storage|/tmp/storage|g' /etc/containers/storage.conf
     - run: buildah images
     - run: ls -al /tmp/storage/overlay-images/
