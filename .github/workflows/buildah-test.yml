@@ -2,43 +2,20 @@ name: buildah test
 on:
   workflow_dispatch:
 jobs:
-  # ubuntu:
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #   - uses: actions/checkout@v2
-  #   - run: buildah unshare ./buildah-test.sh
-  #   - run: buildah images
-  #   - run: ls -al /var/lib/containers
-  test:
+  buildtools:
     runs-on: ubuntu-latest
     container:
       image: quay.io/buildah/stable
       options: --security-opt seccomp=unconfined --security-opt apparmor=unconfined --device /dev/fuse
     steps:
     - uses: actions/checkout@v2
-    - run: dnf install -y podman
-    - run: buildah unshare ./buildah-test.sh
-      env:
-        VERSION: ${{ github.sha }}
-    - run: buildah images
-    - run: buildah unshare bash -c "podman save -o buildtools-${{ github.sha }}.tar localhost/test:${{ github.sha }}"
-    - name: Temporarily save Docker image
-      uses: actions/upload-artifact@v2
-      with:
-        name: buildtools-${{ github.sha }}
-        path: buildtools-${{ github.sha }}.tar
-        retention-days: 1
-
-
-  review:
-    runs-on: ubuntu-latest
-    needs: [ test ]
-    steps:
-    - uses: actions/checkout@v2
-    - name: Retrieve saved Docker image
-      uses: actions/download-artifact@v2
-      with:
-        name: buildtools-${{ github.sha }}
-    - run: pwd && ls -al
-    - run: docker load < buildtools-${{ github.sha }}.tar
-    - run: docker images
+    - run: |
+        mkdir -p /tmp/storage/overlay-images /tmp/storage/overlay-layers
+        touch /tmp/storage/overlay-images/images.lock
+        touch /tmp/storage/overlay-layers/layers.lock
+        sed -i 's|/var/lib/containers/storage|/tmp/storage|g' /etc/containers/storage.conf
+    - run: |
+        podman run --security-opt seccomp=unconfined --security-opt apparmor=unconfined --device /dev/fuse \
+        -v "/home/runner/work":"/__w" -v "/tmp/storage:/var/lib/containers/storage" -w "/__w" \
+        bash -c "buildah unshare ./buildah-test.sh"
+    - run: podman images
