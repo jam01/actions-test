@@ -41,4 +41,4 @@ jobs:
         name: buildtools-${{ github.sha }}
     - run: pwd && ls -al
     - run: docker load < buildtools-${{ github.sha }}.tar
-    - run: buildah images
+    - run: docker images
