@@ -16,6 +16,7 @@ jobs:
       options: --security-opt seccomp=unconfined --security-opt apparmor=unconfined --device /dev/fuse
     steps:
     - uses: actions/checkout@v2
+    - run: dnf install -y podman
     - run: buildah unshare ./buildah-test.sh
       env:
         VERSION: ${{ github.sha }}
