@@ -16,30 +16,28 @@ jobs:
       options: --security-opt seccomp=unconfined --security-opt apparmor=unconfined --device /dev/fuse
     steps:
     - uses: actions/checkout@v2
-    - run: |
-        mkdir -p /tmp/storage/overlay-images /tmp/storage/overlay-layers
-        touch /tmp/storage/overlay-images/images.lock
-        touch /tmp/storage/overlay-layers/layers.lock
-        sed -i 's|/var/lib/containers/storage|/tmp/storage|g' /etc/containers/storage.conf
-    - name: Cache containers
-      uses: actions/cache@v2
-      with:
-        path: /tmp/storage
-        key: buildah-storage-${{ github.sha }}
     - run: buildah unshare ./buildah-test.sh
+      env:
+        VERSION: ${{ github.sha }}
     - run: buildah images
-    - run: ls -al /tmp/storage/overlay-images/
+    - run: podman save -o buildtools-${{ github.sha }}.tar localhost/test:${{ github.sha }}
+    - name: Temporarily save Docker image
+      uses: actions/upload-artifact@v2
+      with:
+        name: buildtools-${{ github.sha }}.tar
+        path: buildtools-${{ github.sha }}.tar
+        retention-days: 1
+
 
   review:
     runs-on: ubuntu-latest
     needs: [ test ]
     steps:
     - uses: actions/checkout@v2
-    - name: Cache containers
-      uses: actions/cache@v2
+    - name: Retrieve saved Docker image
+      uses: actions/download-artifact@v2
       with:
-        path: /tmp/storage
-        key: buildah-storage-${{ github.sha }}
-    - run: sudo sed -i 's|/var/lib/containers/storage|/tmp/storage|g' /etc/containers/storage.conf
+        name: buildtools-${{ github.sha }}.tar
+        path: buildtools-${{ github.sha }}.tar
+    - run: podman load -i buildtools-${{ github.sha }}.tar
     - run: buildah images
-    - run: ls -al /tmp/storage/overlay-images/
