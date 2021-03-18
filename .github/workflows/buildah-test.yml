@@ -4,9 +4,6 @@ on:
 jobs:
   buildtools:
     runs-on: ubuntu-latest
-    container:
-      image: quay.io/buildah/stable
-      options: --security-opt seccomp=unconfined --security-opt apparmor=unconfined --device /dev/fuse
     steps:
     - uses: actions/checkout@v2
     - run: |
