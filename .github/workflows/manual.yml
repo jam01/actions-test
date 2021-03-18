@@ -28,5 +28,8 @@ jobs:
     # Runs a single command using the runners shell
     - name: Send greeting
       run: echo "Hello ${{ github.event.inputs.name }}"
+    - run: |
+        command that should fail
+        pwd
     - name: Debug Action
       uses: hmarr/debug-action@v1.0.0
