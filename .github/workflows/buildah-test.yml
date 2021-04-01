@@ -7,19 +7,6 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - run: |
-        # mkdir -p /tmp/storage/overlay-images /tmp/storage/overlay-layers
-        # touch /tmp/storage/overlay-images/images.lock
-        # touch /tmp/storage/overlay-layers/layers.lock
-        # sudo cat /etc/containers/storage.conf
-        # cat ~/.config/containers/storage.conf
-        # sudo sed -i 's|/var/lib/containers/storage|/tmp/storage|g' /etc/containers/storage.conf
-        # sudo cat /etc/containers/storage.conf | grep "/storage"
-    - run: |
-        #podman run --security-opt seccomp=unconfined --security-opt apparmor=unconfined --device /dev/fuse \
-        #-e "VERSION=${{ github.sha }}" -v "$HOME/.local/share/containers/storage:/var/lib/containers/storage" -v $PWD:$PWD -w $PWD \
-        #quay.io/buildah/stable bash -c "
-
         buildah unshare ./buildah-test.sh
         buildah images
-        #  ls -al /var/lib/containers/storage/overlay-images"
-  #  - run: ls -al /$HOME/.local/share/containers/storage/overlay-images && buildah images && podman images
+    - run: ls -al /$HOME/.local/share/containers/storage/overlay-images && buildah images && podman images
