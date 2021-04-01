@@ -37,7 +37,7 @@ function pip_install {
 container=$(buildah from scratch)
 mount=$(buildah mount $container)
 
-podman run --detach --tty --name installer --volume ${mount}:/mnt/container:rw --volume $PWD:$PWD:Z --workdir $PWD fedora:latest
+podman run --security-opt seccomp=unconfined --security-opt apparmor=unconfined  --detach --tty --name installer --volume ${mount}:/mnt/container:rw --volume $PWD:$PWD:Z --workdir $PWD fedora:latest
 podman exec installer bash -c "yum upgrade -y --quiet"
 
 dnf_install "python awscli git"
