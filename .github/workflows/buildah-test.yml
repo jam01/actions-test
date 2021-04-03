@@ -7,6 +7,9 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - run: |
+        container=$(buildah from scratch)
+        buildah commit --rm $container localhost/test:latest
+    - run: |
         buildah unshare ./buildah-test.sh
         buildah images
     - run: ls -al /$HOME/.local/share/containers/storage/overlay-images && buildah images && podman images
