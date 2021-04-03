@@ -7,6 +7,10 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - run: |
+        sudo apt-get install fuse-overlayfs
+        mkdir -vp ~/.config/containers
+        printf "[storage.options]\nmount_program=\"/usr/bin/fuse-overlayfs\"" > ~/.config/containers/storage.conf
+    - run: |
         container=$(buildah from scratch)
         buildah commit --rm $container localhost/test:latest
     - run: |
