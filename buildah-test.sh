@@ -3,4 +3,5 @@
 set -o nounset
 set -o errexit
 
-echo "boop"
+container=$(buildah from scratch)
+buildah commit --rm container localhost/test:latest
