@@ -6,6 +6,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
+    - run: |        
+        container=$(buildah from scratch)
+        buildah commit --rm $container localhost/test:latest
     - env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         BTRAY: ${{ secrets.BTRAY }}
