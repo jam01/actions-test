@@ -8,6 +8,8 @@ on:
   workflow_dispatch:
     # Inputs the workflow accepts.
     inputs:
+      another:
+        required: false
       name:
         # Friendly description to be shown in the UI instead of 'name'
         description: 'Person to greet'
@@ -28,6 +30,9 @@ jobs:
     # Runs a single command using the runners shell
     - name: Send greeting
       run: echo "Hello ${{ github.event.inputs.name }}"
+    - shell: bash
+      run: |
+        if [ ${{ github.event.inputs.another }} == "" ]; then echo "another"; fi;
     - run: echo $FOO
       env:
         FOO: ${GITHUB_SHA::8}
