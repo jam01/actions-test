@@ -32,7 +32,7 @@ jobs:
       run: echo "Hello ${{ github.event.inputs.name }}"
     - shell: bash
       run: |
-        if [ ${{ github.event.inputs.another }} == "" ]; then echo "another"; fi;
+        if [ '${{ github.event.inputs.another }}' == '' ]; then echo "another"; fi;
     - run: echo $FOO
       env:
         FOO: ${GITHUB_SHA::8}
